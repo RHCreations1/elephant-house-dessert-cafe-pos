@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#145b38">
+  <title>Elephant House | Dessert Café POS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brandmark">EH</div>
+      <div><h1>Elephant House</h1><p>DESSERT CAFÉ <span>•</span> POINT OF SALE</p></div>
+    </div>
+    <div class="topright">
+      <span class="livepill"><i></i><span id="live">Connecting...</span></span>
+      <nav>
+        <button data-t="pos" class="on">⌗ <span>Cashier</span></button>
+        <button data-t="bills">▤ <span>Bills</span></button>
+        <button data-t="dash">▥ <span>Dashboard</span></button>
+        <button data-t="sup">⚙ <span>Supervisor</span></button>
+        <button data-t="stock">▦ <span>Stock Balance</span></button>
+        <button data-t="admin">♙ <span>Admin</span></button>
+      </nav>
+    </div>
+  </header>
+  <main id="m"></main>
+  <div id="bill"></div>
+  <dialog id="dlg"></dialog>
+  <script src="app.bundle.js"></script>
+</body>
+</html>
