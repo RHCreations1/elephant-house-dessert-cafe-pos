@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function role() {
+      return signedIn() && request.auth.token.role is string
+        ? request.auth.token.role
+        : (signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous' ? 'cashier' : 'none');
+    }
+    function supervisorOrAdmin() { return role() in ['supervisor', 'admin']; }
+    function adminOnly() { return role() == 'admin'; }
+
+    match /sales/{billId} {
+      allow read: if signedIn();
+      allow create: if role() in ['cashier', 'supervisor', 'admin'];
+      allow update: if supervisorOrAdmin();
+      allow delete: if false; // Audited callable Cloud Function only.
+    }
+    match /stock/{stockId} {
+      allow read, create, update: if supervisorOrAdmin();
+      allow delete: if false; // Admin clear callable only.
+    }
+    match /config/{configId} {
+      allow read: if signedIn();
+      allow write: if adminOnly();
+    }
+    match /maintenanceBackups/{backupId}/{document=**} {
+      allow read: if adminOnly();
+      allow write: if false; // Admin SDK only.
+    }
+    match /maintenanceBackups/{backupId} {
+      allow read: if adminOnly();
+      allow write: if false;
+    }
+    match /auditLogs/{logId} {
+      allow read: if adminOnly();
+      allow write: if false; // Admin SDK only.
+    }
+    match /authPinAttempts/{attemptId} {
+      allow read, write: if false; // Cloud Functions only.
+    }
+  }
+}
