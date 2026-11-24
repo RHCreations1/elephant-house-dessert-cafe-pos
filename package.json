@@ -1,0 +1,9 @@
+{
+  "name": "elephant-house-dessert-cafe-pos",
+  "private": true,
+  "scripts": {
+    "deploy": "firebase deploy --only firestore:rules,functions,hosting",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:backend": "firebase deploy --only firestore:rules,functions"
+  }
+}
