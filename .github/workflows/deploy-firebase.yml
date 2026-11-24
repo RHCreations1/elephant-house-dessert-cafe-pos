@@ -39,16 +39,18 @@ jobs:
           p = Path("possrc/app.js")
           s = p.read_text()
           s = s.replace('firebase.functions("asia-south1")', 'firebase.app().functions("asia-south1")')
-          old = 'const auth=firebase.auth();\n      if(!auth.currentUser) await auth.signInAnonymously();'
-          new = '''const auth=firebase.auth();
-      // A privileged token must not silently survive a page reload while the UI resets to Cashier.
-      if(auth.currentUser) {
-        const existingToken = await auth.currentUser.getIdTokenResult();
-        if(existingToken.claims.role === "admin" || existingToken.claims.role === "supervisor") {
-          await auth.signOut();
-        }
-      }
-      if(!auth.currentUser) await auth.signInAnonymously();'''
+          old = "const auth=firebase.auth();\n      if(!auth.currentUser) await auth.signInAnonymously();"
+          new = (
+          "const auth=firebase.auth();\n"
+          "      // A privileged token must not silently survive a page reload while the UI resets to Cashier.\n"
+          "      if(auth.currentUser) {\n"
+          "        const existingToken = await auth.currentUser.getIdTokenResult();\n"
+          "        if(existingToken.claims.role === \"admin\" || existingToken.claims.role === \"supervisor\") {\n"
+          "          await auth.signOut();\n"
+          "        }\n"
+          "      }\n"
+          "      if(!auth.currentUser) await auth.signInAnonymously();"
+          )
           if old not in s:
             raise SystemExit("Could not find the Firebase auth initialization block; refusing to continue.")
           s = s.replace(old, new, 1)
