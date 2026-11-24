@@ -1,8 +1,6 @@
 name: Deploy Elephant House POS to Firebase
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -14,6 +12,29 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
+      - name: Preserve deployment workflow
+        run: cp .github/workflows/deploy-firebase.yml /tmp/deploy-firebase.yml
+
+      - name: Restore complete POS source archive
+        run: |
+          cat \
+            .source/package-part-0.b64 \
+            .source/package-part-1a.b64 \
+            .source/package-part-1b.b64 \
+            .source/package-part-3.b64 \
+            .source/package-part-4.b64 \
+            .source/package-part-5a.b64 \
+            .source/package-part-5b.b64 \
+            .source/package-part-5c.b64 \
+            .source/package-part-5d.b64 \
+            .source/package-part-5e.b64 \
+            .source/package-part-5f.b64 \
+            .source/package-part-5g.b64 \
+            | base64 --decode > /tmp/elephant-house-pos-source.zip
+          unzip -oq /tmp/elephant-house-pos-source.zip -d .
+          mkdir -p .github/workflows
+          cp /tmp/deploy-firebase.yml .github/workflows/deploy-firebase.yml
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
