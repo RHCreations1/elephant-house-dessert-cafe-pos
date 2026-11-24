@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   deploy:
@@ -35,6 +35,16 @@ jobs:
           unzip -oq /tmp/elephant-house-pos-source.zip -d .
           mkdir -p .github/workflows
           cp /tmp/deploy-firebase.yml .github/workflows/deploy-firebase.yml
+
+      - name: Commit restored POS source to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Restore complete Elephant House POS source"
+            git push origin HEAD:main
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
