@@ -33,8 +33,27 @@ jobs:
             .source/package-part-5g.b64 \
             | base64 --decode > /tmp/elephant-house-pos-source.zip
           unzip -oq /tmp/elephant-house-pos-source.zip -d .
-          # Firebase compat SDK requires region selection from the FirebaseApp instance.
-          sed -i 's/firebase\.functions("asia-south1")/firebase.app().functions("asia-south1")/g' possrc/app.js
+          # Apply production fixes to the restored client source before committing it.
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("possrc/app.js")
+          s = p.read_text()
+          s = s.replace('firebase.functions("asia-south1")', 'firebase.app().functions("asia-south1")')
+          old = 'const auth=firebase.auth();\n      if(!auth.currentUser) await auth.signInAnonymously();'
+          new = '''const auth=firebase.auth();
+      // A privileged token must not silently survive a page reload while the UI resets to Cashier.
+      if(auth.currentUser) {
+        const existingToken = await auth.currentUser.getIdTokenResult();
+        if(existingToken.claims.role === "admin" || existingToken.claims.role === "supervisor") {
+          await auth.signOut();
+        }
+      }
+      if(!auth.currentUser) await auth.signInAnonymously();'''
+          if old not in s:
+            raise SystemExit("Could not find the Firebase auth initialization block; refusing to continue.")
+          s = s.replace(old, new, 1)
+          p.write_text(s)
+          PY
           rm -rf .source
           mkdir -p .github/workflows
           cp /tmp/deploy-firebase.yml .github/workflows/deploy-firebase.yml
