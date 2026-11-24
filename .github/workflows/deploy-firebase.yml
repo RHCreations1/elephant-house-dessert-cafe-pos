@@ -1,0 +1,35 @@
+name: Deploy Elephant House POS to Firebase
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ELEPHANT_HOUSE_POS }}
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Install Cloud Functions dependencies
+        run: npm install --prefix functions
+
+      - name: Deploy Firestore rules, Cloud Functions and Hosting
+        run: firebase deploy --project elephant-house-pos --only firestore:rules,functions,hosting
