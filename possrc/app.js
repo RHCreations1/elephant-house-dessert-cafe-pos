@@ -62,7 +62,7 @@
   }
   function listenData() {
     db.collection('config').doc('menu').onSnapshot(s => { configCache=s.exists?s.data():{}; render(); }, e=>toast(e.message));
-    const q = role === 'cashier' ? db.collection('sales').where('cashierUid','==',auth.currentUser.uid) : db.collection('sales').orderBy('createdAt','desc').limit(500);
+    const q = role === 'cashier' ? db.collection('sales').where('cashierUid','==',auth.currentUser.uid).where('panel','==',panel) : db.collection('sales').orderBy('createdAt','desc').limit(500);
     q.onSnapshot(s => { salesCache=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if(activeTab==='bills'||activeTab==='dashboard') render(); }, e=>toast(e.message));
     if (role !== 'cashier') db.collection('stock').onSnapshot(s=>{stockCache=s.docs.map(d=>({id:d.id,...d.data()})); if(activeTab==='stock')render();},e=>toast(e.message));
   }
