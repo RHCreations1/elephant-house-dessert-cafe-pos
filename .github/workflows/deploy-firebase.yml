@@ -56,7 +56,6 @@ jobs:
           s = s.replace(old, new, 1)
           p.write_text(s)
           PY
-          rm -rf .source
           mkdir -p .github/workflows
           cp /tmp/deploy-firebase.yml .github/workflows/deploy-firebase.yml
 
